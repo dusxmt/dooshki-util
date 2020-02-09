@@ -1,0 +1,17 @@
+This repository contains various small libraries and utilities which are
+mostly meant to be used in other projects.
+
+
+Currently present libraries:
+
+    dooshki_args:
+
+        A simple UNIX-like argument parsing library with support for
+        long options, mainly meant for use by small projects, targets ANSI C89
+
+
+Currently present programs:
+
+    dooshki_args_demo:
+
+        A demonstration program for the dooshki_args library.
