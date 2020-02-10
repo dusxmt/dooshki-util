@@ -166,6 +166,11 @@ enum dooshki_args_ret
  * and they will consume the options in the order that they come.  For example,
  * if -f and -d accept arguments but -v doesn't, `-fvd file.txt database.dat' 
  * would be the same as `-f file.txt -v -d database.dat'.
+ *
+ * Option parsing can be limited by the use of the stopper keyword, "--".
+ * Arguments specified after the stopper will not be touched by the option
+ * parsing code.  The stopper itself will be removed from the list of arguments
+ * upon parsing completion, just like any other option.
  */
 enum dooshki_args_ret dooshki_args_parse(int *argc, char ***argv,
                                          const struct dooshki_args *args_ctxt);

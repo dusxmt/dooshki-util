@@ -513,9 +513,14 @@ static void process_long_opt(int *argc, char ***argv, unsigned int opt_argi,
                     {
                         if ((*argv)[arg_iter] != NULL)
                         {
-                            argument = (*argv)[arg_iter];
-                            (*argv)[arg_iter] = NULL;
-                            break;
+                            if (strcmp((*argv)[arg_iter], "--") == 0)
+                                break;
+                            else
+                            {
+                                argument = (*argv)[arg_iter];
+                                (*argv)[arg_iter] = NULL;
+                                break;
+                            }
                         }
                     }
                     if (argument == NULL)
@@ -618,8 +623,13 @@ static void process_short_opts(int *argc, char ***argv, unsigned int opt_argi,
                     {
                         if ((*argv)[arg_iter] != NULL)
                         {
-                            argument = (*argv)[arg_iter];
-                            (*argv)[arg_iter] = NULL;
+                            if (strcmp((*argv)[arg_iter], "--") == 0)
+                                break;
+                            else
+                            {
+                                argument = (*argv)[arg_iter];
+                                (*argv)[arg_iter] = NULL;
+                            }
                         }
                     }
                     if (argument == NULL)
@@ -677,18 +687,25 @@ enum dooshki_args_ret dooshki_args_parse(int *argc, char ***argv,
 {
     int arg_iter;
 
-    char show_help    = 0;
-    char show_version = 0;
-    char errors_found = 0;
+    char stopper_reached = 0;
+    char show_help       = 0;
+    char show_version    = 0;
+    char errors_found    = 0;
 
 
-    for (arg_iter = 1; arg_iter < *argc; arg_iter++)
+    for (arg_iter = 1; arg_iter < *argc && !stopper_reached; arg_iter++)
     {
         if ((*argv)[arg_iter] != NULL && ((*argv)[arg_iter])[0] == '-')
         {
             if (((*argv)[arg_iter])[1] == '-')
-                process_long_opt(argc, argv, arg_iter, args_ctxt,
-                                 &show_help, &show_version, &errors_found);
+            {
+                if (((*argv)[arg_iter])[2] == '\0')
+                    stopper_reached = 1;
+
+                else
+                    process_long_opt(argc, argv, arg_iter, args_ctxt,
+                                     &show_help, &show_version, &errors_found);
+            }
             else
                 process_short_opts(argc, argv, arg_iter, args_ctxt,
                                    &show_help, &show_version, &errors_found);
