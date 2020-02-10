@@ -36,6 +36,8 @@
 "a custom type (by the use of a callback function), and displays the collected\n" \
 "information.\n"
 
+#define MAX_VERBOSE_LEVEL 3
+
 
 static const char *program_name = PROG_NAME;
 
@@ -98,6 +100,36 @@ char quality_arg_decode(const char *argument_text, void *opt_storage,
     }
 }
 
+
+char verbose_flag_process(const char *argument_text, void *opt_storage,
+                          const char *opt_prefix, const char *opt_name,
+                          void *callback_data)
+{
+    unsigned int *dest = opt_storage;
+
+    /* This routine doesn't need any callback context data. */
+    (void)callback_data;
+
+    /* This is a _NOARG option handler. */
+    (void)argument_text;
+
+    if (*dest < MAX_VERBOSE_LEVEL)
+    {
+        *dest += 1;
+        return 1;
+    }
+    else
+    {
+        /* Error for the sake of there being an error condition. */
+        fprintf(stderr,
+                "%s: Option %s%s was specified too many times, cannot exceed "
+                "maximal verbosity level of %u.\n",
+                program_name, opt_prefix, opt_name, MAX_VERBOSE_LEVEL);
+
+        return 0;
+    }
+}
+
 /* Values retrieved from the command line. */
 static char automatic = 0;
 static char automatic_opt = 0;
@@ -116,6 +148,9 @@ static char rating_set = 0;
 
 static enum projectile_quality quality = QUALITY_GOOD;
 static char quality_set = 0;
+
+static unsigned int verbose_level = 0;
+static char verbose_level_set = 0;
 
 
 /*
@@ -142,8 +177,12 @@ static const struct dooshki_opt cli_options[] =
     { NULL, "direction", "DIR", DOOSHKI_OPT_INT, &direction, &direction_set,
       "Projectile direction.", NULL, NULL },
 
-    { "v", NULL, "VEL", DOOSHKI_OPT_UINT, &velocity, &velocity_set,
+    { "p", NULL, "VEL", DOOSHKI_OPT_UINT, &velocity, &velocity_set,
       "Projectile velocity.", NULL, NULL },
+
+    { "v", "verbose", NULL, DOOSHKI_OPT_CB_NOARG, &verbose_level, &verbose_level_set,
+      "Produce more verbose output (can be specified multiple times).",
+      verbose_flag_process, NULL },
 
     { "q", "quality", "GOOD|BAD|UGLY", DOOSHKI_OPT_CB, &quality, &quality_set,
       "Quality of the projectiles to be used.", quality_arg_decode, NULL },
@@ -225,6 +264,10 @@ int main(int argc, char **argv)
            automatic?      "automatic" : "manual",
            automatic_opt?  "yes" : "no",
            manual_opt?     "yes" : "no");
+
+    printf("    Verbose level:  %u%s\n",
+           verbose_level,
+           verbose_level_set? "" : " (default)");
 
     printf("    Direction:      ");
     if (direction_set)

@@ -68,13 +68,14 @@
 
 enum dooshki_opt_type
 {
-    DOOSHKI_OPT_BOOL,     /* char, 1 = true, 0 = false */
-    DOOSHKI_OPT_NEGBOOL,  /* char, 0 = true, 1 = false */
-    DOOSHKI_OPT_STR,      /* `const char *'  */
-    DOOSHKI_OPT_INT,      /* long            */
-    DOOSHKI_OPT_UINT,     /* unsigned long   */
-    DOOSHKI_OPT_FLOAT,    /* double          */
-    DOOSHKI_OPT_CB        /* user-defined    */
+    DOOSHKI_OPT_BOOL,     /* char, 1 = true, 0 = false   */
+    DOOSHKI_OPT_NEGBOOL,  /* char, 0 = true, 1 = false   */
+    DOOSHKI_OPT_STR,      /* `const char *'              */
+    DOOSHKI_OPT_INT,      /* long                        */
+    DOOSHKI_OPT_UINT,     /* unsigned long               */
+    DOOSHKI_OPT_FLOAT,    /* double                      */
+    DOOSHKI_OPT_CB,       /* user-defined, with argument */
+    DOOSHKI_OPT_CB_NOARG  /* user-defined, no argument   */
 };
 
 struct dooshki_opt
@@ -93,7 +94,8 @@ struct dooshki_opt
     const char *description;
 
     /*
-     * Callback interface, used when the type is DOOSHKI_OPT_CB.
+     * Callback interface, used by DOOSHKI_OPT_CB and DOOSHKI_OPT_CB_NOARG
+     * options.
      *
      * `argument_text' contains the text of the argument passed to the option,
      * `opt_storage' is a pointer to where the result should be stored,
@@ -101,6 +103,8 @@ struct dooshki_opt
      * which are useful when constructing error messages, and `callback_data'
      * refers to any data which the user might want to make accessible to
      * the routine.
+     *
+     * `argument_text' is NULL for options of the DOOSHKI_OPT_CB_NOARG type.
      *
      * Return value of 1 signifies success, 0 signifies failure.
      */

@@ -485,6 +485,24 @@ static void process_long_opt(int *argc, char ***argv, unsigned int opt_argi,
                 bool_ptr = args_ctxt->opt_desc[iter].opt_storage;
                 *bool_ptr = 0;
             }
+            else if (args_ctxt->opt_desc[iter].type == DOOSHKI_OPT_CB_NOARG)
+            {
+                if (argument != NULL)
+                {
+                    print_error(args_ctxt,
+                                "Argument `%s' not expected for option --%s",
+                                argument, args_ctxt->opt_desc[iter].long_name);
+                    *errors_found = 1;
+                    return;
+                }
+
+                if (! args_ctxt->opt_desc[iter].callback(NULL,
+                                                         args_ctxt->opt_desc[iter].opt_storage,
+                                                         "--",
+                                                         args_ctxt->opt_desc[iter].long_name,
+                                                         args_ctxt->opt_desc[iter].callback_data))
+                    *errors_found = 1;
+            }
             else
             {
                 if (argument == NULL)
@@ -578,6 +596,16 @@ static void process_short_opts(int *argc, char ***argv, unsigned int opt_argi,
 
                     bool_ptr = args_ctxt->opt_desc[opt_iter].opt_storage;
                     *bool_ptr = 0;
+                }
+                else if (args_ctxt->opt_desc[opt_iter].type == DOOSHKI_OPT_CB_NOARG)
+                {
+
+                    if (! args_ctxt->opt_desc[opt_iter].callback(NULL,
+                                                                 args_ctxt->opt_desc[opt_iter].opt_storage,
+                                                                 "-",
+                                                                 args_ctxt->opt_desc[opt_iter].short_name,
+                                                                 args_ctxt->opt_desc[opt_iter].callback_data))
+                        *errors_found = 1;
                 }
                 else
                 {
