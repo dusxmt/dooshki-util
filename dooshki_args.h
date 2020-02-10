@@ -25,6 +25,8 @@
  * of the help screen by modifying the _COL constants in dooshki_args.c,
  * and modify the help and version options (short name, long name, description)
  * by changing the HELP_ and VER_ constants.
+ *
+ * You can find this library in https://github.com/dusxmt/dooshki-util
  */
 
 /*
