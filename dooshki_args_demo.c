@@ -223,15 +223,17 @@ static void list_argv(int argc, char **argv)
     }
     printf(" };\n");
 }
+#else
+#define list_argv(a, b)
 #endif
 
 int main(int argc, char **argv)
 {
     enum dooshki_args_ret arg_parse_ret;
 
-    /* list_argv(argc, argv); */
+    list_argv(argc, argv);
     arg_parse_ret = dooshki_args_parse(&argc, &argv, &cli_args_context);
-    /* list_argv(argc, argv); */
+    list_argv(argc, argv);
 
     switch(arg_parse_ret)
     {
@@ -262,8 +264,8 @@ int main(int argc, char **argv)
     printf("    Label:          %s\n", (label != NULL)? label : "unspecified");
     printf("    Operation type: %s (manual opt: %s, automatic opt: %s)\n",
            automatic?      "automatic" : "manual",
-           automatic_opt?  "yes" : "no",
-           manual_opt?     "yes" : "no");
+           manual_opt?     "yes" : "no",
+           automatic_opt?  "yes" : "no");
 
     printf("    Verbose level:  %u%s\n",
            verbose_level,
