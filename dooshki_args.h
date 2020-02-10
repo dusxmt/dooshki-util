@@ -138,9 +138,7 @@ enum dooshki_args_ret
  * potentially a list of entries.
  *
  * All options are examined, to provide an exhaustive error listing for the
- * user, instead of stopping at the first error in the option.  The exception
- * is when a version or help option is encountered, where the parsing is
- * stopped early, and the appropriate message is shown.  Unknown options
+ * user, instead of stopping at the first error in the option.  Unknown options
  * are considered to be errors.
  *
  * Short options are recognized as letters after a dash, eg. -a is the short

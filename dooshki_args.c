@@ -419,13 +419,15 @@ static void process_long_opt(int *argc, char ***argv, unsigned int opt_argi,
 
     if (strcmp(option, "--" HELP_LONG_OPT) == 0)
     {
-        *show_help = 1;
+        if (! *show_version)
+            *show_help = 1;
         return;
     }
 
     if (strcmp(option, "--" VER_LONG_OPT) == 0)
     {
-        *show_version = 1;
+        if (! *show_help)
+            *show_version = 1;
         return;
     }
 
@@ -536,13 +538,17 @@ static void process_short_opts(int *argc, char ***argv, unsigned int opt_argi,
     {
         if (options[in_iter] == HELP_SHORT_OPT)
         {
-            *show_help = 1;
-            return;
+            if (! *show_version)
+                *show_help = 1;
+
+            continue;
         }
         if (options[in_iter] == VER_SHORT_OPT)
         {
-            *show_version = 1;
-            return;
+            if (! *show_help)
+                *show_version = 1;
+
+            continue;
         }
         for (opt_iter = 0, opt_recognized = 0;
              (args_ctxt->opt_desc[opt_iter].short_name != NULL ||
@@ -661,22 +667,26 @@ enum dooshki_args_ret dooshki_args_parse(int *argc, char ***argv,
 
             (*argv)[arg_iter] = NULL;
         }
-
-        if (show_version)
-        {
-            print_version(args_ctxt);
-            deflate_args_list(argc, argv);
-            return DOOSHKI_ARGS_VER_SHOWN;
-        }
-
-        if (show_help)
-        {
-            print_help(args_ctxt);
-            deflate_args_list(argc, argv);
-            return DOOSHKI_ARGS_HELP_SHOWN;
-        }
     }
     deflate_args_list(argc, argv);
+
+    if (show_help)
+    {
+        if (errors_found)
+            fputc('\n', stderr);
+
+        print_help(args_ctxt);
+        return DOOSHKI_ARGS_HELP_SHOWN;
+    }
+
+    if (show_version)
+    {
+        if (errors_found)
+            fputc('\n', stderr);
+
+        print_version(args_ctxt);
+        return DOOSHKI_ARGS_VER_SHOWN;
+    }
 
     if (errors_found)
     {
