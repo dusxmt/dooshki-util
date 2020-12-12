@@ -1,2 +1,3 @@
 *.o
+Makefile.deps
 dooshki_args_demo
