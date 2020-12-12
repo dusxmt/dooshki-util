@@ -154,18 +154,13 @@ enum dooshki_args_ret
  * eg. --help is an example of a long option.
  *
  * Both types of options may be configured to require an argument.  In the
- * case of short options, this has to be specified in a separate argument word.
- * In the case of long options, an argument may be specified in a separate
- * word, or after an equals sign.
+ * case of short options, an argument has to be specified right after the
+ * option, either within the same word or separated with a space or equals
+ * sign.  In the case of long options, an argument may be specified in
+ * a separate word, or after an equals sign.
  *
- * For example, `-f file.txt', `--file file.txt' and `--file=file.txt'
- * are allowed, but `-ffile.txt' or `-f=file.txt' are not allowed.
- *
- * This is because of the way short argument handling works.  You may put
- * several short options which depend on an argument next to one other,
- * and they will consume the options in the order that they come.  For example,
- * if -f and -d accept arguments but -v doesn't, `-fvd file.txt database.dat' 
- * would be the same as `-f file.txt -v -d database.dat'.
+ * For example, `-f file.txt', `-f=file.txt', `-ffile.txt', `--file file.txt'
+ * and `--file=file.txt' are all allowed.
  *
  * Option parsing can be limited by the use of the stopper keyword, "--".
  * Arguments specified after the stopper will not be touched by the option

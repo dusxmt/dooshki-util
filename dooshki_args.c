@@ -554,10 +554,13 @@ static void process_short_opts(int *argc, char ***argv, unsigned int opt_argi,
     unsigned int in_iter;
     unsigned int opt_iter;
     char opt_recognized;
+    char direct_arg;
 
     const char *options = (*argv)[opt_argi];
 
-    for (in_iter = 1; options[in_iter] != '\0'; in_iter++)
+    for (in_iter = 1, direct_arg = 0;
+         options[in_iter] != '\0' && !direct_arg;
+         in_iter++)
     {
         if (options[in_iter] == HELP_SHORT_OPT)
         {
@@ -614,35 +617,69 @@ static void process_short_opts(int *argc, char ***argv, unsigned int opt_argi,
                 }
                 else
                 {
-                    const char *argument;
-                    int arg_iter;
-
-                    for (arg_iter = opt_argi + 1, argument = NULL;
-                         arg_iter < *argc && argument == NULL;
-                         arg_iter++)
+                    if (options[in_iter + 1] == '\0')
                     {
-                        if ((*argv)[arg_iter] != NULL)
+                        const char *argument;
+                        int arg_iter;
+
+                        for (arg_iter = opt_argi + 1, argument = NULL;
+                             arg_iter < *argc && argument == NULL;
+                             arg_iter++)
                         {
-                            if (strcmp((*argv)[arg_iter], "--") == 0)
-                                break;
-                            else
+                            if ((*argv)[arg_iter] != NULL)
                             {
-                                argument = (*argv)[arg_iter];
-                                (*argv)[arg_iter] = NULL;
+                                if (strcmp((*argv)[arg_iter], "--") == 0)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    argument = (*argv)[arg_iter];
+                                    (*argv)[arg_iter] = NULL;
+                                }
+                            }
+                        }
+                        if (argument == NULL)
+                        {
+                            print_error(args_ctxt,
+                                        "Missing argument for option -%s",
+                                        args_ctxt->opt_desc[opt_iter].short_name);
+                            *errors_found = 1;
+                        }
+                        else if (! process_opt_arg(args_ctxt,
+                                                   &args_ctxt->opt_desc[opt_iter], 0, argument))
+                        {
+                            *errors_found = 1;
+                        }
+
+                    }
+                    else
+                    {
+                        direct_arg = 1;
+
+                        if (options[in_iter + 1] == '=')
+                        {
+                            in_iter += 1;
+                            if (options[in_iter + 1] == '\0')
+                            {
+                                print_error(args_ctxt,
+                                            "Missing argument for option -%s",
+                                            args_ctxt->opt_desc[opt_iter].short_name);
+
+                                *errors_found = 1;
+                                direct_arg = 0;
+                            }
+                        }
+                        if (direct_arg)
+                        {
+                            if (! process_opt_arg(args_ctxt,
+                                                  &args_ctxt->opt_desc[opt_iter], 0,
+                                                  &options[in_iter + 1]))
+                            {
+                                *errors_found = 1;
                             }
                         }
                     }
-                    if (argument == NULL)
-                    {
-                        print_error(args_ctxt,
-                                    "Missing argument for option -%s",
-                                    args_ctxt->opt_desc[opt_iter].short_name);
-                        *errors_found = 1;
-                    }
-                    else if (! process_opt_arg(args_ctxt,
-                                               &args_ctxt->opt_desc[opt_iter],
-                                               0, argument))
-                        *errors_found = 1;
                 }
             }
         }
